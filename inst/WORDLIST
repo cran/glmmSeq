@@ -6,13 +6,11 @@ DAS
 DESeq
 Dabney
 EULAR
-FC
 Fossati
 Giorli
 Github
 Glmm
 GlmmSeq
-HitCount
 IGHJ
 IGHV
 Jimack
@@ -30,11 +28,9 @@ Thorborn
 Timepoint
 Weisberg
 bobyqa
-detectCores
+countdata
 doi
 edgeR
-estimateCommonDisp
-estimateDispersions
 fcPlots
 ggplot
 glmer
@@ -50,7 +46,8 @@ pvalue
 pvalues
 qvalue
 qvalues
+returnList
 seq
 sizeFactors
+tagwise
 tpm
-ubuk

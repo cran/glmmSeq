@@ -1,7 +1,7 @@
 Package: glmmSeq
 Title: General Linear Mixed Models for Gene-Level Differential
         Expression
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: 
     c(person(given = "Myles",family = "Lewis",
     role = c("aut"),
@@ -31,13 +31,13 @@ RoxygenNote: 7.1.1
 Language: en-gb
 URL: https://github.com/KatrionaGoldmann/glmmSeq
 BugReports: https://github.com/KatrionaGoldmann/glmmSeq/issues
-Suggests: knitr, rmarkdown, kableExtra
+Suggests: knitr, rmarkdown, kableExtra, edgeR
 VignetteBuilder: knitr
 Depends: R (>= 3.6.0)
 Imports: MASS, car, stats, gghalves, ggplot2, ggpubr, graphics, lme4,
-        methods, plotly, qvalue
+        methods, plotly, qvalue, pbapply, pbmcapply
 NeedsCompilation: no
-Packaged: 2021-03-09 16:20:39 UTC; phd
+Packaged: 2021-03-30 10:34:56 UTC; phd
 Author: Myles Lewis [aut] (<https://orcid.org/0000-0001-9365-5345>),
   Katriona Goldmann [aut, cre] (<https://orcid.org/0000-0002-9073-6323>),
   Elisabetta Sciacca [aut] (<https://orcid.org/0000-0001-7525-1558>),
@@ -45,4 +45,4 @@ Author: Myles Lewis [aut] (<https://orcid.org/0000-0001-9365-5345>),
   Anna Surace [ctb] (<https://orcid.org/0000-0001-9589-3005>)
 Maintainer: Katriona Goldmann <k.goldmann@qmul.ac.uk>
 Repository: CRAN
-Date/Publication: 2021-03-11 14:30:02 UTC
+Date/Publication: 2021-03-30 11:40:02 UTC

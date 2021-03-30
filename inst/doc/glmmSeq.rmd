@@ -2,17 +2,24 @@
 title: "glmmSeq"
 author: "Myles Lewis, Katriona Goldmann, Elisabetta Sciacca, Cankut Cubuk, Anna Surace"
 date: "`r Sys.Date()`"
-output: 
-  rmarkdown::html_vignette:
-      self_contained: no
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{glmmSeq}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
   
+<style type="text/css">
+.main-container {
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>  
+  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 8, fig.height = 6)
+options(width=96)
 library(kableExtra)
 ```
 
@@ -28,7 +35,7 @@ library(kableExtra)
 
 # glmmSeq 
 
-<img src="https://katrionagoldmann.github.io/glmmSeq/logo.png" align="right" alt="" width="200" hspace="20" />
+<img src="https://katrionagoldmann.github.io/glmmSeq/logo.png" align="right" alt="glmmSeq logo" width="200" hspace="20" border="0"/>
 
 
 The aim of this package is to model gene expression with a general linear mixed
@@ -131,7 +138,8 @@ kable(head(metadata), row.names = F) %>% kable_styling()
 
 ```{r}
 tpm = tpm[, metadata$SAMID]
-kable(head(tpm)) %>% kable_styling()
+kable(head(tpm)) %>% kable_styling() %>%
+  scroll_box(width = "100%")
 ```
 
 ## Dispersion
@@ -154,13 +162,52 @@ disp <- apply(tpm, 1, function(x){
 head(disp)
 ```
 
-Alternatively DESeq2 (estimateDispersions) and edgeR (estimateCommonDisp) provide
-their own dispersion calculations which can also be passed in as a named vector.
+Alternatively, we recommend using _edgeR_ to estimate of the common, trended and 
+tagwise dispersions across all tags:
+
+```{r, message=FALSE}
+disp  <- setNames(edgeR::estimateDisp(tpm)$tagwise.dispersion, rownames(tpm))
+
+head(disp)
+```
+
+or with _DESeq2_ using the raw counts:
+
+```{r, eval=FALSE}
+dds <- DESeqDataSetFromTximport(txi = txi, colData = metadata, design = ~ 1)
+dds <- DESeq(dds)
+dispersions <- setNames(dispersions(dds), rownames(txi$counts))
+```
+
+
+## Size Factors
+
+There is also an option to include size factors for each gene. Again this can be 
+estimated using:
+
+```{r}
+sizeFactors <- colSums(tpm)  
+sizeFactors <- sizeFactors / mean(sizeFactors)  # normalise
+
+head(sizeFactors)
+```
+
+Or using edgeR these can be calculated from the raw read counts: 
+
+```{r, eval=FALSE}
+sizeFactors <- calcNormFactors(counts, method="TMM")
+```
+
+Similarly, with DESeq2: 
+
+```{r, eval=FALSE}
+sizeFactors <- estimateSizeFactorsForMatrix(counts)
+```
 
 # Fitting Models
 
 <style>
-div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px;}
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px; text-align:center;}
 </style>
 
 To fit a model for one gene over time we use a formula such as:
@@ -177,7 +224,7 @@ In this case study we want to use time and response as fixed effects and the
 patients as random effects:
 
 <div class = "blue">
-> gene expression ~ time + response + (1 | patient)
+gene expression ~ time + response + (1 | patient)
 </div>
 
 To fit this model for all genes we can use the `glmmSeq` function. Note that
@@ -195,6 +242,7 @@ results <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
                   dispersion = disp,
                   removeDuplicatedMeasures = FALSE,
                   removeSingles=FALSE,
+                  progress=TRUE,
                   cores = 1)
 ```
 
@@ -348,7 +396,7 @@ par(oldpar)
 
 Alternatively to plot the model fits alone you can use the modelPlot function:
 
-```{r}
+```{r, message=FALSE}
 library(ggpubr)
 
 p1 <- modelPlot(results,

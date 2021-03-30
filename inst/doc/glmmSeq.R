@@ -1,18 +1,19 @@
-## ----setup, include=FALSE-----------------------------------------------------
+## ----setup, include=FALSE---------------------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE, fig.width = 8, fig.height = 6)
+options(width=96)
 library(kableExtra)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE------------------------------------------------------------------------------
 #  install.packages("glmmSeq")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE------------------------------------------------------------------------------
 #  devtools::install_github("KatrionaGoldmann/glmmSeq")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE------------------------------------------------------------------------------
 #  functions = list.files("./R", full.names = TRUE)
 #  invisible(lapply(functions, source))
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE------------------------------------------------------------------------------
 #  # Install CRAN packages
 #  invisible(lapply(c("MASS", "car", "ggplot2", "ggpubr", "lme4", "methods",
 #                     "parallel", "plotly", "stats", "gghalves"),
@@ -32,14 +33,14 @@ library(kableExtra)
 #  }))
 #  
 
-## ---- message=FALSE, warning=FALSE--------------------------------------------
+## ---- message=FALSE, warning=FALSE------------------------------------------------------------
 library(glmmSeq)
 set.seed(1234)
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 data(PEAC_minimal_load)
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 metadata$EULAR_binary  = NA
 metadata$EULAR_binary[metadata$EULAR_6m %in%
                         c("Good responder", "Moderate responder" )] = "responder"
@@ -48,18 +49,41 @@ metadata = metadata[! is.na(metadata$EULAR_binary), ]
 
 kable(head(metadata), row.names = F) %>% kable_styling()
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 tpm = tpm[, metadata$SAMID]
-kable(head(tpm)) %>% kable_styling()
+kable(head(tpm)) %>% kable_styling() %>%
+  scroll_box(width = "100%")
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 disp <- apply(tpm, 1, function(x){
   (var(x, na.rm=TRUE)-mean(x, na.rm=TRUE))/(mean(x, na.rm=TRUE)**2)
   })
 
 head(disp)
 
-## ---- warning=FALSE-----------------------------------------------------------
+## ---- message=FALSE---------------------------------------------------------------------------
+disp  <- setNames(edgeR::estimateDisp(tpm)$tagwise.dispersion, rownames(tpm))
+
+head(disp)
+
+## ---- eval=FALSE------------------------------------------------------------------------------
+#  dds <- DESeqDataSetFromTximport(txi = txi, colData = metadata, design = ~ 1)
+#  dds <- DESeq(dds)
+#  dispersions <- setNames(dispersions(dds), rownames(txi$counts))
+
+## ---------------------------------------------------------------------------------------------
+sizeFactors <- colSums(tpm)  
+sizeFactors <- sizeFactors / mean(sizeFactors)  # normalise
+
+head(sizeFactors)
+
+## ---- eval=FALSE------------------------------------------------------------------------------
+#  sizeFactors <- calcNormFactors(counts, method="TMM")
+
+## ---- eval=FALSE------------------------------------------------------------------------------
+#  sizeFactors <- estimateSizeFactorsForMatrix(counts)
+
+## ---- warning=FALSE---------------------------------------------------------------------------
 results <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
                   id = "PATID",
                   countdata = tpm,
@@ -67,9 +91,10 @@ results <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
                   dispersion = disp,
                   removeDuplicatedMeasures = FALSE,
                   removeSingles=FALSE,
+                  progress=TRUE,
                   cores = 1)
 
-## ---- warning=FALSE-----------------------------------------------------------
+## ---- warning=FALSE---------------------------------------------------------------------------
 results2 <- glmmSeq(~ Timepoint * EULAR_binary + (1 | PATID),
                   id = "PATID",
                   countdata = tpm,
@@ -79,29 +104,29 @@ results2 <- glmmSeq(~ Timepoint * EULAR_binary + (1 | PATID),
                   removeSingles=FALSE,
                   cores = 1)
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 names(attributes(results))
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 kable(results@modelData) %>% kable_styling()
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 stats = data.frame(results@stats)
 
 kable(stats[order(stats$P_Timepoint.EULAR_6m), ]) %>%
   kable_styling() %>%
   scroll_box(width = "100%", height = "400px")
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 predict = data.frame(results@predict)
 kable(predict) %>%
   kable_styling() %>%
   scroll_box(width = "100%", height = "400px")
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 results <- glmmQvals(results, pi0=1)
 
-## ---- warning=FALSE-----------------------------------------------------------
+## ---- warning=FALSE---------------------------------------------------------------------------
 MS4A1glmm <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
                      id = "PATID",
                      countdata = tpm["MS4A1", ],
@@ -109,7 +134,7 @@ MS4A1glmm <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
                      dispersion = disp,
                      verbose=FALSE)
 
-## ---- warning=FALSE-----------------------------------------------------------
+## ---- warning=FALSE---------------------------------------------------------------------------
 MS4A1fit <- glmmGene(~ Timepoint * EULAR_6m + (1 | PATID),
                      gene = "MS4A1",
                      id = "PATID",
@@ -119,7 +144,7 @@ MS4A1fit <- glmmGene(~ Timepoint * EULAR_6m + (1 | PATID),
 
 MS4A1fit
 
-## ---- fig.height=6, warning=FALSE---------------------------------------------
+## ---- fig.height=6, warning=FALSE-------------------------------------------------------------
 plotColours <- c("skyblue", "goldenrod1", "mediumseagreen")
 modColours <- rep(c("dodgerblue3", "goldenrod3", "seagreen4"), each=2)
 
@@ -139,7 +164,7 @@ pairedPlot(glmmResult=results,
            addViolin = TRUE,
            pairedOnly = FALSE)
 
-## ---- fig.height=6, warning=FALSE---------------------------------------------
+## ---- fig.height=6, warning=FALSE-------------------------------------------------------------
 oldpar <- par()
 par(mfrow=c(1, 2))
 
@@ -165,7 +190,7 @@ p2 = pairedPlot(glmmResult=results,
 
 par(oldpar)
 
-## -----------------------------------------------------------------------------
+## ---- message=FALSE---------------------------------------------------------------------------
 library(ggpubr)
 
 p1 <- modelPlot(results,
@@ -193,7 +218,7 @@ p2 <- modelPlot(results,
 
 ggarrange(p1, p2, ncol=2, common.legend = T, legend="bottom")
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 # Genes to label:
 labels = c('MS4A1', 'FGF14', 'IL2RG', 'IGHV3-23', 'ADAM12', 'FGFRL1', 'IL36G', 
            'BLK', 'SAA1', 'CILP', 'EMILIN3', 'EMILIN2', 'IGHJ6', 
@@ -208,7 +233,7 @@ fcPlot(glmmResult=results,
        useAdjusted = FALSE,
        plotCutoff = 1)
 
-## ---- fig.height=6, warning=FALSE---------------------------------------------
+## ---- fig.height=6, warning=FALSE-------------------------------------------------------------
 p1 <- pairedPlot(glmmResult=results,
                  geneName = "ADAM12",
                  x1Label = "Timepoint",
@@ -236,7 +261,7 @@ p2 <- pairedPlot(glmmResult=results,
 
 ggarrange(p1, p2, ncol=2)
 
-## -----------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------
 fcPlot(glmmResult=results,
        x2Label="Timepoint",
        x1Label="EULAR_6m",
@@ -247,7 +272,7 @@ fcPlot(glmmResult=results,
        plotCutoff = 1,
        graphics="ggplot")
 
-## ---- fig.height=8------------------------------------------------------------
+## ---- fig.height=8----------------------------------------------------------------------------
 maPlots <- maPlot(results,
                   x1Label="Timepoint",
                   x2Label="EULAR_6m",
@@ -259,7 +284,7 @@ maPlots <- maPlot(results,
 
 maPlots$combined
 
-## ---- fig.height=8------------------------------------------------------------
+## ---- fig.height=8----------------------------------------------------------------------------
 maPlots <- maPlot(results,
                   x2Label="Timepoint",
                   x1Label="EULAR_6m",
@@ -271,6 +296,6 @@ maPlots <- maPlot(results,
 
 maPlots$combined
 
-## ---- warning=FALSE-----------------------------------------------------------
+## ---- warning=FALSE---------------------------------------------------------------------------
 citation("glmmSeq")
 
