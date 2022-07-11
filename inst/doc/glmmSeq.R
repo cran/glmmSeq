@@ -146,7 +146,10 @@ MS4A1fit
 
 ## ---- fig.height=6, warning=FALSE-------------------------------------------------------------
 plotColours <- c("skyblue", "goldenrod1", "mediumseagreen")
-modColours <- rep(c("dodgerblue3", "goldenrod3", "seagreen4"), each=2)
+modColours <- c("Good responder"="dodgerblue3", 
+                "Moderate responder"= "goldenrod3", 
+                "Non responder"="seagreen4")
+shapes <- c("Moderate responder"=19, "Good responder"= 17, "Non responder"=18)
 
 pairedPlot(glmmResult=results,
            geneName = "IGHV3-23",
@@ -156,13 +159,16 @@ pairedPlot(glmmResult=results,
            IDColumn = "PATID",
            graphics = "ggplot",
            colours = plotColours,
-           modelColour = modColours,
-           modelLineColour = modColours,
+           shapes = shapes,
+           lineColours = plotColours, 
+           modelColours = modColours,
+           modelLineColours = modColours,
+           modelSize = 10, 
            fontSize=10,
            x2Offset = 8,
            logTransform=TRUE,
            addViolin = TRUE,
-           pairedOnly = FALSE)
+           pairedOnly = FALSE) 
 
 ## ---- fig.height=6, warning=FALSE-------------------------------------------------------------
 oldpar <- par()
@@ -176,7 +182,10 @@ p1 = pairedPlot(glmmResult=results2,
                 graphics="base",
                 fontSize=0.65,
                 colours=c("coral", "mediumseagreen"),
-                modelSize = 1)
+                addModel=T,
+                modelColours = c("coral", "mediumseagreen"),
+                modelLineColours = "black",
+                modelSize = 2)
 
 p2 = pairedPlot(glmmResult=results,
                 geneName = "EMILIN3",
@@ -234,18 +243,19 @@ fcPlot(glmmResult=results,
        plotCutoff = 1)
 
 ## ---- fig.height=6, warning=FALSE-------------------------------------------------------------
-p1 <- pairedPlot(glmmResult=results,
+p1<- pairedPlot(glmmResult=results,
                  geneName = "ADAM12",
                  x1Label = "Timepoint",
                  x2Label="EULAR_6m",
                  IDColumn = "PATID",
                  graphics="ggplot",
                  colours = "grey60",
-                 modelColour = rep(plotColours, each=2),
-                 modelLineColour =rep(plotColours, each=2),
+                 modelColour = plotColours, 
+                 modelLineColour =  plotColours, 
                  addViolins=FALSE,
                  fontSize=8,
-                 logTransform=T) + theme(plot.subtitle=element_text(size=9))
+                 logTransform=T) +
+  theme(plot.subtitle=element_text(size=9))
 
 p2 <- pairedPlot(glmmResult=results,
                  geneName = "IGHJ6",
@@ -254,10 +264,11 @@ p2 <- pairedPlot(glmmResult=results,
                  IDColumn = "PATID",
                  graphics="ggplot",
                  addViolins = FALSE,
-                 colours = c("blue"),
+                 colours = "blue",
                  fontSize=8,
                  modelSize=0.1,
-                 logTransform=T) + theme(plot.subtitle=element_text(size=9))
+                 logTransform=T) +
+  theme(plot.subtitle=element_text(size=9))
 
 ggarrange(p1, p2, ncol=2)
 
