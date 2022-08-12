@@ -5,9 +5,9 @@
 \title{MA plots}
 \usage{
 maPlot(
-  glmmResult,
-  x1Label,
-  x2Label,
+  object,
+  x1var,
+  x2var,
   x1Values = NULL,
   x2Values = NULL,
   pCutoff = 0.01,
@@ -16,24 +16,24 @@ maPlot(
   colours = c("grey", "midnightblue", "mediumvioletred", "goldenrod"),
   labels = c(),
   fontSize = 12,
-  labelFontSize = 5,
+  labelFontSize = 4,
   useAdjusted = FALSE,
   graphics = "ggplot",
   verbose = FALSE
 )
 }
 \arguments{
-\item{glmmResult}{A glmmSeq object created by
+\item{object}{A glmmSeq object created by
 \code{\link[glmmSeq:glmmSeq]{glmmSeq::glmmSeq()}}.}
 
-\item{x1Label}{The name of the first (inner) x parameter}
+\item{x1var}{The name of the first (inner) x parameter}
 
-\item{x2Label}{The name of the second (outer) x parameter}
+\item{x2var}{The name of the second (outer) x parameter}
 
-\item{x1Values}{Subpopulations in x1Label to be used to calculate fold
-change. If NULL the first two levels in x1Label are used.}
+\item{x1Values}{Timepoints or categories in \code{x1var} to be used to calculate fold
+change. If \code{NULL} the first two levels in \code{x1var} are used.}
 
-\item{x2Values}{Subpopulations in x2Label to be compared on x and y axis.}
+\item{x2Values}{Categories in \code{x2var} to be compared on x and y axis.}
 
 \item{pCutoff}{The significance cut-off for colour-coding (default=0.01)}
 
@@ -41,7 +41,7 @@ change. If NULL the first two levels in x1Label are used.}
 (default=1 for all markers)}
 
 \item{zeroCountCutoff}{Which probes to include by minimum counts cut-off
-(default = 50)}
+(default=50)}
 
 \item{colours}{Vector of colours to use for significance groups}
 
@@ -51,15 +51,15 @@ change. If NULL the first two levels in x1Label are used.}
 
 \item{labelFontSize}{Font size for labels}
 
-\item{useAdjusted}{whether to use adjusted pvalues
-(must have q_ columns in glmmResult)}
+\item{useAdjusted}{whether to use adjusted p-values
+(must have q-values in \code{object})}
 
 \item{graphics}{Either "ggplot" or "plotly"}
 
 \item{verbose}{Whether to print statistics}
 }
 \value{
-List of three plots. One plot for each x2Value and one combined
+List of three plots. One plot for each \code{x2Value} and one combined
 figure
 }
 \description{
@@ -73,15 +73,14 @@ disp <- apply(tpm, 1, function(x){
 })
 
 resultTable <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
-                       id = "PATID",
                        countdata = tpm[1:5, ],
                        metadata = metadata,
                        dispersion = disp)
 
 plots <- maPlot(resultTable,
-                x1Label='Timepoint',
-                x2Label='EULAR_6m',
-                x2Values=c('Good responder', 'Non responder'),
+                x1var='Timepoint',
+                x2var='EULAR_6m',
+                x2Values=c('Good', 'Non-response'),
                 graphics="plotly")
 
 plots$combined
