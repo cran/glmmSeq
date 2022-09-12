@@ -178,6 +178,7 @@ modelPlot(results,
           x1var = "Timepoint",
           x2var = "EULAR_6m",
           colours = plotColours,
+          plab = c("time", "response", "time:response"),
           addModel = FALSE)
 
 par(oldpar)
@@ -205,43 +206,24 @@ p2 <- ggmodelPlot(results,
 
 ggarrange(p1, p2, ncol=2, common.legend = T, legend="bottom")
 
-## -------------------------------------------------------------------------------------
-# Genes to label:
+## ---- eval = FALSE--------------------------------------------------------------------
+#  r4ra_glmm <- glmmSeq(~ time * drug + (1 | Patient_ID),
+#                         countdata = tpmdata, metadata,
+#                         dispersion = dispersions, cores = 8, removeSingles = T)
+#  r4ra_glmm <- glmmQvals(r4ra_glmm)
+#  labels = c(..)  # Genes to label
+#  fcPlot(r4ra_glmm, x1var = "time", x2var = "drug", graphics = "plotly",
+#         pCutoff = 0.05, useAdjusted = TRUE,
+#         labels = labels,
+#         colours = c('grey', 'green3', 'gold3', 'blue'))
+
+## ----fcplot, echo = FALSE, message=FALSE, fig.align='center', out.width='80%', out.extra='style="border: 0;"'----
+knitr::include_graphics("r4ra_glmm_fcplot.png")
+
+## ---- fig.height=8--------------------------------------------------------------------
 labels = c('MS4A1', 'FGF14', 'IL2RG', 'IGHV3-23', 'ADAM12', 'IL36G', 
            'BLK', 'SAA1', 'CILP', 'EMILIN3', 'EMILIN2', 'IGHJ6', 
            'CXCL9', 'CXCL13')
-
-fcPlot(results,
-       x1var="Timepoint",
-       x2var="EULAR_6m",
-       x2Values=c("Good", "Non-response"),
-       pCutoff=0.1,
-       labels=labels,
-       useAdjusted = FALSE,
-       plotCutoff = 1)
-
-## ---- fig.height=6, warning=FALSE-----------------------------------------------------
-p1<- ggmodelPlot(results,
-                 geneName = "ADAM12",
-                 x1var = "Timepoint",
-                 x2var="EULAR_6m",
-                 colours = "grey60",
-                 modelColour = plotColours, 
-                 modelLineColour =  plotColours) +
-  theme(plot.subtitle=element_text(size=9))
-
-p2 <- ggmodelPlot(results,
-                  geneName = "IGHJ6",
-                  x1var = "Timepoint",
-                  x2var="EULAR_6m",
-                  colours = "blue",
-                  fontSize=8,
-                  modelSize=0.1) +
-  theme(plot.subtitle=element_text(size=9))
-
-ggarrange(p1, p2, ncol=2)
-
-## ---- fig.height=8--------------------------------------------------------------------
 maPlots <- maPlot(results,
                   x1var="Timepoint",
                   x2var="EULAR_6m",

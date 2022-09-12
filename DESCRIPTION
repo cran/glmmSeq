@@ -1,14 +1,14 @@
 Package: glmmSeq
 Title: General Linear Mixed Models for Gene-Level Differential
         Expression
-Version: 0.4.0
+Version: 0.5.1
 Authors@R: 
     c(person(given = "Myles",family = "Lewis",
-    role = c("aut"),
+    role = c("aut", "cre"),
     email = "myles.lewis@qmul.ac.uk",
     comment = c(ORCID = "0000-0001-9365-5345")),
     person(given = "Katriona",family = "Goldmann",
-    role = c("aut", "cre"),
+    role = c("aut"),
     email = "k.goldmann@qmul.ac.uk",
     comment = c(ORCID = "0000-0002-9073-6323")),
     person(given = "Elisabetta",family = "Sciacca",
@@ -28,22 +28,22 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 biocViews:
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Language: en-gb
 URL: https://github.com/KatrionaGoldmann/glmmSeq
 BugReports: https://github.com/KatrionaGoldmann/glmmSeq/issues
 Suggests: knitr, rmarkdown, kableExtra, DESeq2, edgeR, emmeans
 VignetteBuilder: knitr
 Depends: R (>= 3.6.0)
-Imports: MASS, car, stats, ggplot2, ggpubr, graphics, lme4, lmerTest,
-        methods, plotly, qvalue, pbapply, pbmcapply
+Imports: MASS, car, stats, ggplot2, ggpubr, glmmTMB, graphics, lme4,
+        lmerTest, methods, plotly, qvalue, pbapply, pbmcapply
 NeedsCompilation: no
-Packaged: 2022-08-12 11:46:43 UTC; myles
-Author: Myles Lewis [aut] (<https://orcid.org/0000-0001-9365-5345>),
-  Katriona Goldmann [aut, cre] (<https://orcid.org/0000-0002-9073-6323>),
+Packaged: 2022-09-12 11:33:29 UTC; myles
+Author: Myles Lewis [aut, cre] (<https://orcid.org/0000-0001-9365-5345>),
+  Katriona Goldmann [aut] (<https://orcid.org/0000-0002-9073-6323>),
   Elisabetta Sciacca [aut] (<https://orcid.org/0000-0001-7525-1558>),
   Cankut Cubuk [ctb] (<https://orcid.org/0000-0003-4646-0849>),
   Anna Surace [ctb] (<https://orcid.org/0000-0001-9589-3005>)
-Maintainer: Katriona Goldmann <k.goldmann@qmul.ac.uk>
+Maintainer: Myles Lewis <myles.lewis@qmul.ac.uk>
 Repository: CRAN
-Date/Publication: 2022-08-12 13:10:07 UTC
+Date/Publication: 2022-09-12 12:10:02 UTC
