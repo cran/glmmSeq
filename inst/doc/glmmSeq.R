@@ -6,7 +6,7 @@ library(kableExtra)
 #  install.packages("glmmSeq")
 
 ## ---- eval=FALSE----------------------------------------------------------------------
-#  devtools::install_github("KatrionaGoldmann/glmmSeq")
+#  devtools::install_github("myles-lewis/glmmSeq")
 
 ## ---- eval=FALSE----------------------------------------------------------------------
 #  functions = list.files("./R", full.names = TRUE)
@@ -128,6 +128,15 @@ lmmres <- lmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
 summary(lmmres, "MS4A1")
 
 ## ---- warning=FALSE-------------------------------------------------------------------
+glmmLRT <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
+                   reduced = ~ Timepoint + EULAR_6m + (1 | PATID),
+                   countdata = tpm,
+                   metadata = metadata,
+                   dispersion = disp, verbose = FALSE)
+
+summary(glmmLRT, "MS4A1")
+
+## ---- warning=FALSE-------------------------------------------------------------------
 MS4A1glmm <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
                      countdata = tpm["MS4A1", , drop = FALSE],
                      metadata = metadata,
@@ -143,6 +152,12 @@ library(emmeans)
 
 emmeans(fit, ~ Timepoint | EULAR_6m)
 emmip(fit, ~ Timepoint | EULAR_6m)
+
+## ---- warning=FALSE-------------------------------------------------------------------
+fit2 <- glmmRefit(results, gene = "MS4A1",
+                  formula = count ~ Timepoint + EULAR_6m + (1 | PATID))
+
+anova(fit, fit2)
 
 ## ---- fig.height=6, warning=FALSE-----------------------------------------------------
 plotColours <- c("skyblue", "goldenrod1", "mediumseagreen")
@@ -234,6 +249,15 @@ maPlots <- maPlot(results,
                   graphics="ggplot")
 
 maPlots$combined
+
+## -------------------------------------------------------------------------------------
+results@errors[1]   # first gene error
+
+## ---- error=TRUE----------------------------------------------------------------------
+results3 <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
+                    countdata = tpm[, metadata$Timepoint == 0],
+                    metadata = metadata[metadata$Timepoint == 0, ],
+                    dispersion = disp)
 
 ## ---- warning=FALSE-------------------------------------------------------------------
 citation("glmmSeq")

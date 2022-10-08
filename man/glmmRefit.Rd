@@ -2,9 +2,22 @@
 % Please edit documentation in R/glmmRefit.R
 \name{glmmRefit}
 \alias{glmmRefit}
+\alias{glmmRefit.lmmSeq}
+\alias{glmmRefit.GlmmSeq}
 \title{Refit mixed effects model}
 \usage{
 glmmRefit(object, gene, ...)
+
+\method{glmmRefit}{lmmSeq}(object, gene, formula = object@formula, ...)
+
+\method{glmmRefit}{GlmmSeq}(
+  object,
+  gene,
+  formula = object@formula,
+  control = object@info$control,
+  family = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{A fitted results object of class \code{GlmmSeq} or \code{lmmSeq}}
@@ -12,11 +25,20 @@ glmmRefit(object, gene, ...)
 \item{gene}{A character value specifying a single gene to extract a fitted
 model for}
 
-\item{...}{Optional arguments passed to either \link[lme4:glmer]{lme4::glmer} or \link[lme4:lmer]{lme4::lmer}}
+\item{...}{Optional arguments passed to either \code{\link[lme4:glmer]{lme4::glmer()}} or
+\code{\link[lme4:lmer]{lme4::lmer()}}}
+
+\item{formula}{Optional formula to use when refitting model}
+
+\item{control}{Optional control parameters, see \code{\link[lme4:lmerControl]{lme4::lmerControl()}} or
+\code{\link[lme4:lmerControl]{lme4::glmerControl()}}}
+
+\item{family}{Optional GLM family when refitting GLMM using \code{\link[lme4:glmer]{lme4::glmer()}}
+or \code{\link[=glmmTMB]{glmmTMB()}}}
 }
 \value{
-Fitted model of class \code{lmerMod} in the case of LMM, or \code{glmerMod} or \code{glmmTMB} for
-a GLMM dependent on the original method.
+Fitted model of class \code{lmerMod} in the case of LMM, or \code{glmerMod} or
+\code{glmmTMB} for a GLMM dependent on the original method.
 }
 \description{
 Based on a 'GlmmSeq' or 'lmmSeq' class result object, this function attempts
@@ -25,4 +47,29 @@ parameters stored in the results object and refitting using either
 \code{\link[lme4:glmer]{lme4::glmer()}} for \code{GlmmSeq} objects or \code{lmer()} for \code{lmmSeq} objects. The
 fitted model can then be passed on to other packages such as \code{emmeans} to
 look at estimated marginal means for the model.
+}
+\examples{
+data(PEAC_minimal_load)
+disp <- apply(tpm, 1, function(x) {
+  (var(x, na.rm = TRUE)-mean(x, na.rm = TRUE))/(mean(x, na.rm = TRUE)**2)
+})
+glmmtest <- glmmSeq(~ Timepoint * EULAR_6m + (1 | PATID),
+                     countdata = tpm[1:2, ],
+                     metadata = metadata,
+                     dispersion = disp,
+                     verbose = FALSE)
+
+# show summary for single gene
+summary(glmmtest, "MS4A1")
+
+# refit a single model using lme4::glmer()
+fit <- glmmRefit(glmmtest, "MS4A1")
+
+# refit model with reduced formula
+fit2 <- glmmRefit(glmmtest, "MS4A1",
+                  formula = count ~ Timepoint + EULAR_6m + (1 | PATID))
+
+# LRT
+anova(fit, fit2)
+
 }

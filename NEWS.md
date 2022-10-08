@@ -1,6 +1,20 @@
 News
 =====
 
+# glmmSeq v0.5.5
+###### 29/09/2022
+* Improve error handling if all genes give errors
+
+# glmmSeq v0.5.4
+###### 25/09/2022
+* Add option for likelihood ratio test (LRT) in `glmmSeq()` and `lmmSeq()`
+* Enable changing of model formula, family and control parameters when refitting
+model for a single gene in `glmmRefit()`
+
+# glmmSeq v0.5.2
+###### 19/09/2022
+* Fix passing of `...` in parallelisation on windows in `glmmSeq()` & `lmmSeq()`
+
 # glmmSeq v0.5.1
 ###### 02/09/2022
 * Add option to `glmmSeq()` to use `glmmTMB` package for fitting negative
