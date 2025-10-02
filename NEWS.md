@@ -1,6 +1,15 @@
 News
 =====
 
+# glmmSeq 0.5.7
+###### 29/09/2025
+* Fixing broken links in documetation and adding kableExtra to Imports.
+
+# glmmSeq v0.5.6
+###### 17/01/2025
+* Now returns variance of the random effect term as an additional column in the 
+`@predict` slot.
+
 # glmmSeq v0.5.5
 ###### 29/09/2022
 * Improve error handling if all genes give errors
